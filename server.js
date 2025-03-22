@@ -12,11 +12,6 @@ const port = 4000
 app.use(express.json())
 app.use(cors())
 
-//Test Route
-app.get("/",(req,res)=>{
-    res.send("API Working")
-})
-
 // Test Database Connection
 app.get('/test-db', (req, res) => {
     db.query('SELECT 1', (err, results) => {

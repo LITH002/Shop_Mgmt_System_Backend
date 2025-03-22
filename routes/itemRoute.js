@@ -1,5 +1,5 @@
 import express from "express";
-import { addItem } from "../controllers/itemController.js"; 
+import { addItem, listItem, removeItem } from "../controllers/itemController.js"; 
 import multer from "multer";
 import path from "path";
 import fs from "fs";
@@ -14,36 +14,25 @@ if (!fs.existsSync(uploadDir)) {
 
 // Image Storage Engine
 const storage = multer.diskStorage({
-    destination: function (req, file, cb) {
-        console.log("Multer is processing file...");
-        cb(null, uploadDir);
-    },
-    filename: function (req, file, cb) {
-        console.log("Received file:", file);
+    destination: uploadDir,
+    filename: (req, file, cb) => {
         cb(null, `${Date.now()}${path.extname(file.originalname)}`);
     }
 });
 
-// Add file filter to ensure only images are uploaded
+// File filter to allow only images
 const fileFilter = (req, file, cb) => {
-    if (!file) {
-        cb(new Error("No file uploaded"), false);
-    } else if (!file.mimetype.startsWith("image/")) {
-        cb(new Error("Only image files are allowed"), false);
-    } else {
-        cb(null, true);
+    if (!file.mimetype.startsWith("image/")) {
+        return cb(new Error("Only image files are allowed"), false);
     }
+    cb(null, true);
 };
 
-const upload = multer({ 
-    storage: storage,
-    fileFilter: fileFilter 
-});
+const upload = multer({ storage, fileFilter });
 
-// Middleware to check if file is being received
-itemRouter.post("/add", upload.single("image"), (req, res, next) => {
-    console.log("Uploaded File in Route:", req.file); // Debugging Multer
-    next();
-}, addItem);
+// Define API routes
+itemRouter.post("/add", upload.single("image"), addItem);
+itemRouter.get("/list", listItem);
+itemRouter.post("/remove", removeItem); // Changed from POST to DELETE (best practice)
 
 export default itemRouter;
