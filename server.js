@@ -3,6 +3,9 @@ import cors from "cors"
 import db from "./config/db.js";
 import itemRouter from "./routes/itemRoute.js";
 import createItemTable from "./models/itemModel.js";
+import createUserTable from "./models/userModel.js";
+import userRouter from "./routes/userRoute.js";
+import 'dotenv/config';
 
 //App Config
 const app = express()
@@ -27,6 +30,7 @@ app.get('/test-db', (req, res) => {
 //API Endpoints
 app.use("/api/item",itemRouter);
 app.use("/images",express.static('uploads'));
+app.use("/api/user",userRouter);
 
 //Start Server
 app.listen(port,()=>{
@@ -34,3 +38,4 @@ app.listen(port,()=>{
 })
 
 createItemTable();
+createUserTable();
